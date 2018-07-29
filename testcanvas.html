@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="robot.js"></script>
+    <script src="TestScript.js"></script>
+    <title> My Robot Simulator </title>
+    <style>
+        canvas {
+            background: black;
+            display: relative;
+            background-image:url('5x5.jpg');
+            background-repeat: no-repeat;
+            background-size:750px 750px;
+            margin:0px;
+        }
+
+        .btn,
+        input,
+        select {
+            margin: 10px;
+        }
+
+        .jumbotron {
+            /* background-color: #262F36 !important; */
+            padding-top: 30px;
+        }
+
+        body {
+            background: url(background-image.jpg) repeat fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            
+        }
+
+        #shadowLayer {
+            background-color: grey;
+            opacity: .4;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .text-light {
+            color: #fff;
+        }
+        .vranger {
+   transform: rotate(270deg);
+  -moz-transform: rotate(270deg); /*do same for other browsers if required*/
+  margin-bottom: 40px;
+}
+    </style>
+</head>
+
+<body>
+    <div id="shadowLayer"></div>
+    <h1 class="text-center"> My Robot Simulator </h1>
+    <div class="">
+        <div class="container">
+            <div style="display: flex;">
+                <div class="col-md-12">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-primary btn-block" onclick="triggerPlace()"> Place </button>
+                            </div>
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-danger btn-block" onclick="triggerReport()"> Report </button>
+                            </div>
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-default btn-block" onclick="triggerMove()"> Move </button>
+                            </div>
+
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-default btn-block" onclick="triggerRight()"> Right </button>
+                            </div>
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-default btn-block" onclick="triggerLeft()"> Left </button>
+                            </div>
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-warning btn-block" onclick="triggerOffline(event)"> Go Offline</button>
+                            </div>
+                            <div class="col-md-12 form-group">
+                                <label for="xcoordinate" class="control-label h3 text-light text-center">
+                                    <strong> X </strong>
+                                </label>
+                                <input class="form-control" type="range" id="xcoordinate" value="0" min="0" max="4" value="0" />
+                            </div>
+                            <div class="col-md-12 form-group">
+                                <label for="ycoordinate" class="control-label h3 text-light text-center">
+                                    <strong> Y </strong>
+                                </label>
+                                <input class="form-control vranger" type="range" id="ycoordinate" value="0" min="0" max="4" value="0" />
+                            </div>
+                            
+                            <div class="col-md-12 form-group">
+                                <select class="form-control" id="direction">
+                                    <option value="N" selected>North</option>
+                                    <option value="S">South</option>
+                                    <option value="E">East</option>
+                                    <option value="W">West</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 form-group">
+                                <button type="button" class="btn btn-success btn-block" onclick="runTest()"> Run Test</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <canvas id="tableBoard" width="750" height="750">
+                        </canvas>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <div id="tipsModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close " data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Tips
+                                <span class="glyphicon glyphicon-info-sign text-primary"></span>
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>
+                                You can press 'Enter' to start
+                            </p>
+                            <p>
+                                Use
+                                <span class="glyphicon glyphicon-arrow-up text-primary"></span> to move forward,
+                                <span class="glyphicon glyphicon-arrow-right text-primary"></span> to turn right, and
+                                <span class="glyphicon glyphicon-arrow-left text-primary"></span> to turn left
+                            </p>
+                            <p>
+                                Alternatively use the panel on the left side.
+                            </p>
+                            <p>
+                                Press 'Escape' to close popup
+                            </p>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div id="customModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div id='customModalHeader' class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title" id="customModalTitle">
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <p id="customModalContent">
+
+                            </p>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        $("#tipsModal").modal('show');
+        var myRobot = new Robot();
+        var canvas = document.getElementById("tableBoard");
+        var ctx = canvas.getContext("2d");
+        var imgN = document.createElement('img');
+        var imgS = document.createElement('img');
+        var imgW = document.createElement('img');
+        var imgE = document.createElement('img');
+        var ctHeight = canvas.height;
+        var ctWidth = canvas.width;
+        imgS.src = 'South.png';
+        imgN.src = 'North.png';
+        imgW.src = 'West.png';
+        imgE.src = 'East.png';
+
+        setInterval(drawRobot, 10);
+        function drawRobot() {
+            if (myRobot.isPlaced) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                if (myRobot.facingNorth()) {
+                    ctx.drawImage(imgN, (1.5 * myRobot.x), 600 - (1.5 * myRobot.y), 150, 150);
+                }
+                if (myRobot.facingEast()) {
+                    ctx.drawImage(imgE, (1.5 * myRobot.x), 600 - (1.5 * myRobot.y), 150, 150);
+                } if (myRobot.facingSouth()) {
+                    ctx.drawImage(imgS, (1.5 * myRobot.x), 600 - (1.5 * myRobot.y), 150, 150);
+                } if (myRobot.facingWest()) {
+                    ctx.drawImage(imgW, (1.5 * myRobot.x), 600 - (1.5 * myRobot.y), 150, 150);
+                }
+            }
+        }
+
+
+        function triggerReport() {
+            myRobot.report();
+        }
+        function triggerMove() {
+            myRobot.transitMoveStart();
+        }
+        function triggerPlace() {
+            myRobot.place(parseInt(document.getElementById('xcoordinate').value), parseInt(document.getElementById('ycoordinate').value), document.getElementById('direction').value);
+        }
+        function triggerRight() {
+            myRobot.right();
+        }
+        function triggerLeft() { myRobot.left(); }
+
+
+        function triggerOffline(event) {
+            var btn = event.target;
+            myRobot.goOffline();
+            var sec = 5;
+            btn.disabled = true;
+            var offlineInterval = setInterval(function () {
+                if (sec === 0) {
+                    btn.innerHTML = "Go Offline";
+                    clearInterval(offlineInterval);
+                    btn.disabled = false;
+
+                }
+                else {
+                    sec -= 1;
+                    btn.innerHTML = sec  + " seconds remaining";
+                }
+            }, 900);
+
+        }
+
+        document.addEventListener('keyup', function (e) {
+            if (e.which == 13) { $('.modal').modal('hide'); triggerPlace(); }
+            if (e.which == 27) { $('.modal').modal('hide'); }
+            if (e.which == 37) { triggerLeft() }
+            if (e.which == 38) { triggerMove(); }
+            if (e.which == 39) { triggerRight(); }
+        });
+
+        function max4() { if (this.value <= 4) return true; else return false; }
+
+        //Run Test Case
+        
+    </script>
+
+</body>
+
+</html>
